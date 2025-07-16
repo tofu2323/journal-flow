@@ -15,7 +15,7 @@ const JournalForm = () => {
   }
 
   const handleChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev: any) => ({ ...prev, [field]: value }))
   }
 
   const renderForm = () => {
