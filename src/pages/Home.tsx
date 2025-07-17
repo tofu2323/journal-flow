@@ -6,7 +6,10 @@ import { getJournals, initDB } from '../utils/db'
 const Home = () => {
   const [showNewEntryMenu, setShowNewEntryMenu] = useState(false)
   const [entries, setEntries] = useState<JournalEntry[]>([])
+  const [filteredEntries, setFilteredEntries] = useState<JournalEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedType, setSelectedType] = useState<string>('all')
   
   const journalTypes = [
     { type: 'formal-practice', title: 'フォーマル実践', emoji: '🧘‍♂️' },
@@ -19,6 +22,32 @@ const Home = () => {
   useEffect(() => {
     loadEntries()
   }, [])
+
+  useEffect(() => {
+    filterEntries()
+  }, [entries, searchQuery, selectedType])
+
+  const filterEntries = () => {
+    let filtered = entries
+
+    // タイプフィルター
+    if (selectedType !== 'all') {
+      filtered = filtered.filter(entry => entry.type === selectedType)
+    }
+
+    // 検索フィルター
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(entry => {
+        const preview = getEntryPreview(entry).toLowerCase()
+        const journalType = journalTypes.find(j => j.type === entry.type)
+        const typeTitle = journalType?.title.toLowerCase() || ''
+        return preview.includes(query) || typeTitle.includes(query)
+      })
+    }
+
+    setFilteredEntries(filtered)
+  }
 
   const loadEntries = async () => {
     try {
@@ -154,6 +183,83 @@ const Home = () => {
           January 2025
         </h2>
 
+        {/* Search and Filter */}
+        {entries.length > 0 && (
+          <div style={{ marginBottom: '1.5rem' }}>
+            {/* Search Bar */}
+            <div style={{ marginBottom: '1rem' }}>
+              <input
+                type="text"
+                placeholder="🔍 ジャーナルを検索..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '12px',
+                  fontSize: '1rem',
+                  backgroundColor: 'white',
+                  transition: 'all 0.2s'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#007AFF'
+                  e.target.style.boxShadow = '0 0 0 4px rgba(0, 122, 255, 0.1)'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#d1d5db'
+                  e.target.style.boxShadow = 'none'
+                }}
+              />
+            </div>
+
+            {/* Type Filter Buttons */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setSelectedType('all')}
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: selectedType === 'all' ? 'none' : '1px solid #e5e7eb',
+                  borderRadius: '20px',
+                  background: selectedType === 'all' ? '#007AFF' : 'white',
+                  color: selectedType === 'all' ? 'white' : '#6b7280',
+                  fontSize: '0.85rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                すべて ({entries.length})
+              </button>
+              {journalTypes.map((type) => {
+                const count = entries.filter(e => e.type === type.type).length
+                if (count === 0) return null
+                return (
+                  <button
+                    key={type.type}
+                    onClick={() => setSelectedType(type.type)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      border: selectedType === type.type ? 'none' : '1px solid #e5e7eb',
+                      borderRadius: '20px',
+                      background: selectedType === type.type ? '#007AFF' : 'white',
+                      color: selectedType === type.type ? 'white' : '#6b7280',
+                      fontSize: '0.85rem',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {type.emoji} {type.title} ({count})
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
 {loading ? (
           <div style={{ 
             textAlign: 'center', 
@@ -173,9 +279,38 @@ const Home = () => {
             <h3 style={{ marginBottom: '0.5rem' }}>最初のジャーナルを書いてみましょう</h3>
             <p>思いついた時にサクッと記録して、フロー状態でジャーナリングしましょう</p>
           </div>
+        ) : filteredEntries.length === 0 ? (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '3rem 1rem',
+            color: '#6b7280'
+          }}>
+            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🔍</div>
+            <h3 style={{ marginBottom: '0.5rem' }}>該当するジャーナルが見つかりません</h3>
+            <p>検索条件やフィルターを変更してみてください</p>
+            <button 
+              onClick={() => {
+                setSearchQuery('')
+                setSelectedType('all')
+              }}
+              style={{
+                marginTop: '1rem',
+                padding: '0.75rem 1.5rem',
+                backgroundColor: '#007AFF',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                fontWeight: '500'
+              }}
+            >
+              フィルターをリセット
+            </button>
+          </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {entries.map((entry) => (
+            {filteredEntries.map((entry) => (
               <Link
                 key={entry.id}
                 to={`/journal/detail/${entry.id}`}

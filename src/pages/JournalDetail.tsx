@@ -42,7 +42,7 @@ const JournalDetail = () => {
     
     try {
       await deleteJournal(journal.id)
-      navigate('/list')
+      navigate('/')
     } catch (error) {
       console.error('Failed to delete journal:', error)
       alert('削除に失敗しました。')
@@ -168,8 +168,8 @@ const JournalDetail = () => {
       <div className="container">
         <div className="card">
           <h2>エントリーが見つかりません</h2>
-          <Link to="/list" className="btn btn-primary">
-            一覧に戻る
+          <Link to="/" className="btn btn-primary">
+            ホームに戻る
           </Link>
         </div>
       </div>
@@ -195,8 +195,8 @@ const JournalDetail = () => {
           <button onClick={handleDelete} className="btn btn-secondary" style={{ background: '#ef4444', color: 'white' }}>
             削除
           </button>
-          <Link to="/list" className="btn btn-secondary">
-            一覧に戻る
+          <Link to="/" className="btn btn-secondary">
+            ホームに戻る
           </Link>
         </div>
       </div>
