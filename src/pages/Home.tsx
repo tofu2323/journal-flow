@@ -110,59 +110,48 @@ const Home = () => {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      backgroundColor: '#f8fafc',
       paddingBottom: '100px' // FABのスペース確保
     }}>
       {/* Header Stats */}
       <div style={{ 
-        padding: '1rem',
-        backgroundColor: 'white',
-        borderBottom: '1px solid #e5e7eb'
+        padding: 'var(--space-4)',
+        background: 'rgba(255, 255, 255, 0.6)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
         <div style={{ 
           display: 'flex', 
           justifyContent: 'space-between',
           maxWidth: '768px',
-          margin: '0 auto'
+          margin: '0 auto',
+          gap: 'var(--space-4)'
         }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ 
-              backgroundColor: '#e0e7ff', 
-              borderRadius: '12px', 
-              padding: '0.5rem',
-              marginBottom: '0.25rem',
-              display: 'inline-block'
+          <div className="stats-card" style={{ flex: 1 }}>
+            <div className="stats-icon" style={{ 
+              background: 'linear-gradient(135deg, var(--primary-100) 0%, var(--primary-200) 100%)'
             }}>
               📝
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{entries.length}</div>
-            <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>今年のエントリー</div>
+            <div className="stats-number">{entries.length}</div>
+            <div className="stats-label">今年のエントリー</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ 
-              backgroundColor: '#fce7f3', 
-              borderRadius: '12px', 
-              padding: '0.5rem',
-              marginBottom: '0.25rem',
-              display: 'inline-block'
+          <div className="stats-card" style={{ flex: 1 }}>
+            <div className="stats-icon" style={{ 
+              background: 'linear-gradient(135deg, var(--success-50) 0%, var(--success-100) 100%)'
             }}>
               ✍️
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{getTotalWords()}</div>
-            <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>書いた文字数</div>
+            <div className="stats-number">{getTotalWords()}</div>
+            <div className="stats-label">書いた文字数</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ 
-              backgroundColor: '#ddd6fe', 
-              borderRadius: '12px', 
-              padding: '0.5rem',
-              marginBottom: '0.25rem',
-              display: 'inline-block'
+          <div className="stats-card" style={{ flex: 1 }}>
+            <div className="stats-icon" style={{ 
+              background: 'linear-gradient(135deg, var(--warning-50) 0%, var(--warning-100) 100%)'
             }}>
               📅
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{getUniqueDays()}</div>
-            <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>ジャーナル日数</div>
+            <div className="stats-number">{getUniqueDays()}</div>
+            <div className="stats-label">ジャーナル日数</div>
           </div>
         </div>
       </div>
@@ -171,9 +160,10 @@ const Home = () => {
       <div style={{ maxWidth: '768px', margin: '0 auto', padding: '1rem' }}>
         <h2 style={{ 
           fontSize: '1.5rem', 
-          fontWeight: 'bold', 
-          marginBottom: '1rem',
-          color: '#1f2937'
+          fontWeight: '600', 
+          marginBottom: 'var(--space-4)',
+          color: 'var(--gray-800)',
+          letterSpacing: '-0.025em'
         }}>
           {new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' })}
         </h2>
@@ -182,49 +172,21 @@ const Home = () => {
         {entries.length > 0 && (
           <div style={{ marginBottom: '1.5rem' }}>
             {/* Search Bar */}
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: 'var(--space-4)' }}>
               <input
                 type="text"
                 placeholder="🔍 ジャーナルを検索..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '12px',
-                  fontSize: '1rem',
-                  backgroundColor: 'white',
-                  transition: 'all 0.2s'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#007AFF'
-                  e.target.style.boxShadow = '0 0 0 4px rgba(0, 122, 255, 0.1)'
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#d1d5db'
-                  e.target.style.boxShadow = 'none'
-                }}
+                className="form-input"
               />
             </div>
 
             {/* Type Filter Buttons */}
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
               <button
                 onClick={() => setSelectedType('all')}
-                style={{
-                  padding: '0.5rem 1rem',
-                  border: '1px solid transparent',
-                  borderColor: selectedType === 'all' ? '#007AFF' : '#e5e7eb',
-                  borderRadius: '20px',
-                  background: selectedType === 'all' ? '#007AFF' : 'white',
-                  color: selectedType === 'all' ? 'white' : '#6b7280',
-                  fontSize: '0.85rem',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  whiteSpace: 'nowrap'
-                }}
+                className={`filter-btn ${selectedType === 'all' ? 'active' : ''}`}
               >
                 すべて ({entries.length})
               </button>
@@ -235,19 +197,7 @@ const Home = () => {
                   <button
                     key={type.type}
                     onClick={() => setSelectedType(type.type)}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      border: '1px solid transparent',
-                      borderColor: selectedType === type.type ? '#007AFF' : '#e5e7eb',
-                      borderRadius: '20px',
-                      background: selectedType === type.type ? '#007AFF' : 'white',
-                      color: selectedType === type.type ? 'white' : '#6b7280',
-                      fontSize: '0.85rem',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      whiteSpace: 'nowrap'
-                    }}
+                    className={`filter-btn ${selectedType === type.type ? 'active' : ''}`}
                   >
                     {type.emoji} {type.title} ({count})
                   </button>
@@ -306,50 +256,30 @@ const Home = () => {
             </button>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             {filteredEntries.map((entry) => (
               <Link
                 key={entry.id}
                 to={`/journal/detail/${entry.id}`}
+                className="entry-card"
                 style={{
-                  backgroundColor: 'white',
-                  borderRadius: '16px',
-                  padding: '1.5rem',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
                   textDecoration: 'none',
                   color: 'inherit',
                   display: 'block'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
                 }}
               >
                 <div style={{ 
                   display: 'flex', 
                   alignItems: 'flex-start', 
-                  gap: '1rem' 
+                  gap: 'var(--space-4)' 
                 }}>
                   <span style={{ fontSize: '1.5rem' }}>{getJournalEmoji(entry.type)}</span>
                   <div style={{ flex: 1 }}>
-                    <p style={{ 
-                      lineHeight: '1.6',
-                      color: '#374151',
-                      marginBottom: '0.75rem'
-                    }}>
+                    <p className="entry-preview">
                       {getEntryPreview(entry).substring(0, 120)}
                       {getEntryPreview(entry).length > 120 && '...'}
                     </p>
-                    <div style={{ 
-                      fontSize: '0.875rem', 
-                      color: '#6b7280'
-                    }}>
+                    <div className="entry-meta">
                       <span>{formatDate(entry.createdAt.toString())}</span>
                     </div>
                   </div>
@@ -361,86 +291,70 @@ const Home = () => {
       </div>
 
       {/* Floating Action Button */}
-      <div style={{
-        position: 'fixed',
-        bottom: '2rem',
-        right: '2rem',
-        zIndex: 1000
-      }}>
-        <button
-          onClick={() => setShowNewEntryMenu(!showNewEntryMenu)}
-          style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            backgroundColor: '#4f46e5',
-            color: 'white',
-            border: 'none',
-            fontSize: '1.5rem',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(79, 70, 229, 0.4)',
-            transition: 'all 0.2s',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.1)'
-            e.currentTarget.style.boxShadow = '0 6px 16px rgba(79, 70, 229, 0.5)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)'
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.4)'
-          }}
-        >
-          {showNewEntryMenu ? '×' : '+'}
-        </button>
+      <button
+        onClick={() => setShowNewEntryMenu(!showNewEntryMenu)}
+        className="fab"
+      >
+        {showNewEntryMenu ? '×' : '+'}
+      </button>
 
-        {/* New Entry Menu */}
-        {showNewEntryMenu && (
-          <div style={{
-            position: 'absolute',
-            bottom: '70px',
-            right: '0',
-            backgroundColor: 'white',
-            borderRadius: '16px',
-            padding: '1rem',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-            minWidth: '200px',
-            animation: 'fadeInUp 0.2s ease-out'
+      {/* New Entry Menu */}
+      {showNewEntryMenu && (
+        <div style={{
+          position: 'fixed',
+          bottom: '5rem',
+          right: 'var(--space-8)',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: 'var(--radius-2xl)',
+          padding: 'var(--space-4)',
+          boxShadow: 'var(--shadow-xl)',
+          minWidth: '200px',
+          animation: 'fadeInUp 0.2s ease-out',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          zIndex: 1000
+        }}>
+          <div style={{ 
+            marginBottom: 'var(--space-3)', 
+            fontWeight: '600', 
+            color: 'var(--gray-700)',
+            fontSize: '0.875rem',
+            letterSpacing: '0.025em'
           }}>
-            <div style={{ marginBottom: '0.5rem', fontWeight: '600', color: '#374151' }}>
-              新しいジャーナル
-            </div>
-            {journalTypes.map((type) => (
-              <Link
-                key={type.type}
-                to={`/journal/${type.type}`}
-                onClick={() => setShowNewEntryMenu(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.75rem',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f3f4f6'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent'
-                }}
-              >
-                <span style={{ fontSize: '1.2rem' }}>{type.emoji}</span>
-                <span style={{ fontSize: '0.9rem' }}>{type.title}</span>
-              </Link>
-            ))}
+            新しいジャーナル
           </div>
-        )}
-      </div>
+          {journalTypes.map((type) => (
+            <Link
+              key={type.type}
+              to={`/journal/${type.type}`}
+              onClick={() => setShowNewEntryMenu(false)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-3)',
+                padding: 'var(--space-3)',
+                borderRadius: 'var(--radius-lg)',
+                textDecoration: 'none',
+                color: 'var(--gray-700)',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontSize: '0.875rem',
+                fontWeight: '500'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(var(--primary-500), 0.1)'
+                e.currentTarget.style.color = 'var(--primary-600)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+                e.currentTarget.style.color = 'var(--gray-700)'
+              }}
+            >
+              <span style={{ fontSize: '1.1rem' }}>{type.emoji}</span>
+              <span>{type.title}</span>
+            </Link>
+          ))}
+        </div>
+      )}
 
       <style>{`
         @keyframes fadeInUp {
