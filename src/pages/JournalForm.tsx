@@ -191,15 +191,50 @@ const JournalForm = () => {
             </div>
             <div className="form-group">
               <label className="form-label">そのとき、快の感情に気づいていましたか？</label>
-              <select
-                className="form-input"
-                value={formData.awarenessAtTime === true ? 'true' : formData.awarenessAtTime === false ? 'false' : ''}
-                onChange={(e) => handleChange('awarenessAtTime', e.target.value === 'true')}
-              >
-                <option value="">選択してください</option>
-                <option value="true">はい、気づいていました</option>
-                <option value="false">いいえ、後で気づきました</option>
-              </select>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <label style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 'var(--space-2)',
+                  cursor: 'pointer',
+                  padding: 'var(--space-3)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--gray-300)',
+                  background: formData.awarenessAtTime === true ? 'var(--primary-50)' : 'rgba(255, 255, 255, 0.8)',
+                  transition: 'all 0.2s'
+                }}>
+                  <input
+                    type="radio"
+                    name="awarenessAtTime"
+                    value="true"
+                    checked={formData.awarenessAtTime === true}
+                    onChange={() => handleChange('awarenessAtTime', true)}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>はい、気づいていました</span>
+                </label>
+                <label style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 'var(--space-2)',
+                  cursor: 'pointer',
+                  padding: 'var(--space-3)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--gray-300)',
+                  background: formData.awarenessAtTime === false ? 'var(--primary-50)' : 'rgba(255, 255, 255, 0.8)',
+                  transition: 'all 0.2s'
+                }}>
+                  <input
+                    type="radio"
+                    name="awarenessAtTime"
+                    value="false"
+                    checked={formData.awarenessAtTime === false}
+                    onChange={() => handleChange('awarenessAtTime', false)}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>いいえ、後で気づきました</span>
+                </label>
+              </div>
             </div>
             <div className="form-group">
               <label className="form-label">そのとき、体はどのように感じましたか？</label>
@@ -283,15 +318,50 @@ const JournalForm = () => {
             </div>
             <div className="form-group">
               <label className="form-label">そのとき、不快の感情に気づいていましたか？</label>
-              <select
-                className="form-input"
-                value={formData.awarenessAtTime === true ? 'true' : formData.awarenessAtTime === false ? 'false' : ''}
-                onChange={(e) => handleChange('awarenessAtTime', e.target.value === 'true')}
-              >
-                <option value="">選択してください</option>
-                <option value="true">はい、気づいていました</option>
-                <option value="false">いいえ、後で気づきました</option>
-              </select>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <label style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 'var(--space-2)',
+                  cursor: 'pointer',
+                  padding: 'var(--space-3)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--gray-300)',
+                  background: formData.awarenessAtTime === true ? 'var(--primary-50)' : 'rgba(255, 255, 255, 0.8)',
+                  transition: 'all 0.2s'
+                }}>
+                  <input
+                    type="radio"
+                    name="awarenessAtTimeUnpleasant"
+                    value="true"
+                    checked={formData.awarenessAtTime === true}
+                    onChange={() => handleChange('awarenessAtTime', true)}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>はい、気づいていました</span>
+                </label>
+                <label style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 'var(--space-2)',
+                  cursor: 'pointer',
+                  padding: 'var(--space-3)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--gray-300)',
+                  background: formData.awarenessAtTime === false ? 'var(--primary-50)' : 'rgba(255, 255, 255, 0.8)',
+                  transition: 'all 0.2s'
+                }}>
+                  <input
+                    type="radio"
+                    name="awarenessAtTimeUnpleasant"
+                    value="false"
+                    checked={formData.awarenessAtTime === false}
+                    onChange={() => handleChange('awarenessAtTime', false)}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>いいえ、後で気づきました</span>
+                </label>
+              </div>
             </div>
             <div className="form-group">
               <label className="form-label">そのとき、体はどのように感じましたか？</label>
@@ -402,15 +472,50 @@ const JournalForm = () => {
             </div>
             <div className="form-group">
               <label className="form-label">この問題は解決しましたか？</label>
-              <select
-                className="form-input"
-                value={formData.resolved === true ? 'true' : formData.resolved === false ? 'false' : ''}
-                onChange={(e) => handleChange('resolved', e.target.value === 'true')}
-              >
-                <option value="">選択してください</option>
-                <option value="true">はい、解決しました</option>
-                <option value="false">いいえ、まだ解決していません</option>
-              </select>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <label style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 'var(--space-2)',
+                  cursor: 'pointer',
+                  padding: 'var(--space-3)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--gray-300)',
+                  background: formData.resolved === true ? 'var(--success-50)' : 'rgba(255, 255, 255, 0.8)',
+                  transition: 'all 0.2s'
+                }}>
+                  <input
+                    type="radio"
+                    name="resolved"
+                    value="true"
+                    checked={formData.resolved === true}
+                    onChange={() => handleChange('resolved', true)}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>はい、解決しました</span>
+                </label>
+                <label style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 'var(--space-2)',
+                  cursor: 'pointer',
+                  padding: 'var(--space-3)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--gray-300)',
+                  background: formData.resolved === false ? 'var(--warning-50)' : 'rgba(255, 255, 255, 0.8)',
+                  transition: 'all 0.2s'
+                }}>
+                  <input
+                    type="radio"
+                    name="resolved"
+                    value="false"
+                    checked={formData.resolved === false}
+                    onChange={() => handleChange('resolved', false)}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>いいえ、まだ解決していません</span>
+                </label>
+              </div>
             </div>
             <div className="form-group">
               <label className="form-label">どのように解決したか、または解決したいですか？</label>
