@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import JournalForm from './pages/JournalForm'
 import JournalList from './pages/JournalList'
 import JournalDetail from './pages/JournalDetail'
+import WeeklyTheme from './pages/WeeklyTheme'
 
 function App() {
   return (

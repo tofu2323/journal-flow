@@ -24,6 +24,13 @@ const Navigation = () => {
             <span style={{ fontSize: '1.2rem' }}>📖</span>
             <span>すべて</span>
           </Link>
+          <Link 
+            to="/theme" 
+            className={`nav-link ${location.pathname === '/theme' ? 'active' : ''}`}
+          >
+            <span style={{ fontSize: '1.2rem' }}>🎯</span>
+            <span>テーマ</span>
+          </Link>
         </div>
       </div>
     </nav>

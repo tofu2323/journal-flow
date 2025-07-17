@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { JournalEntry } from '../types'
+import { JournalEntry, JournalType } from '../types'
 import { getJournals } from '../utils/db'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
@@ -15,11 +15,18 @@ const journalTypeLabels = {
 
 const JournalList = () => {
   const [journals, setJournals] = useState<JournalEntry[]>([])
+  const [filteredJournals, setFilteredJournals] = useState<JournalEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedType, setSelectedType] = useState<JournalType | 'all'>('all')
 
   useEffect(() => {
     loadJournals()
   }, [])
+
+  useEffect(() => {
+    filterJournals()
+  }, [journals, searchQuery, selectedType])
 
   const loadJournals = async () => {
     try {
@@ -34,6 +41,27 @@ const JournalList = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const filterJournals = () => {
+    let filtered = journals
+
+    // タイプフィルター
+    if (selectedType !== 'all') {
+      filtered = filtered.filter(journal => journal.type === selectedType)
+    }
+
+    // 検索フィルター
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(journal => {
+        const preview = getPreview(journal).toLowerCase()
+        const typeLabel = journalTypeLabels[journal.type].toLowerCase()
+        return preview.includes(query) || typeLabel.includes(query)
+      })
+    }
+
+    setFilteredJournals(filtered)
   }
 
   const getPreview = (journal: JournalEntry) => {
@@ -64,10 +92,50 @@ const JournalList = () => {
   return (
     <div className="container">
       <div className="card">
-        <h2>📖 ジャーナルの振り返り</h2>
-        <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
+        <h2>📖 すべてのジャーナル</h2>
+        <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
           過去のエントリーを振り返って、気づきを深めましょう
         </p>
+
+        {/* 検索・フィルター */}
+        {journals.length > 0 && (
+          <div style={{ marginBottom: '1.5rem' }}>
+            {/* 検索バー */}
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="🔍 ジャーナルを検索..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ fontSize: '1rem' }}
+              />
+            </div>
+
+            {/* タイプフィルター */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setSelectedType('all')}
+                className={`filter-btn ${selectedType === 'all' ? 'active' : ''}`}
+              >
+                すべて ({journals.length})
+              </button>
+              {Object.entries(journalTypeLabels).map(([type, label]) => {
+                const count = journals.filter(j => j.type === type).length
+                if (count === 0) return null
+                return (
+                  <button
+                    key={type}
+                    onClick={() => setSelectedType(type as JournalType)}
+                    className={`filter-btn ${selectedType === type ? 'active' : ''}`}
+                  >
+                    {label} ({count})
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
         
         {journals.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2rem' }}>
@@ -79,9 +147,24 @@ const JournalList = () => {
               ジャーナルを書く
             </Link>
           </div>
+        ) : filteredJournals.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <p style={{ color: '#9ca3af', marginBottom: '1rem' }}>
+              検索条件に一致するジャーナルが見つかりません。
+            </p>
+            <button 
+              onClick={() => {
+                setSearchQuery('')
+                setSelectedType('all')
+              }}
+              className="btn btn-secondary"
+            >
+              フィルターをリセット
+            </button>
+          </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {journals.map((journal) => (
+            {filteredJournals.map((journal) => (
               <Link 
                 key={journal.id} 
                 to={`/journal/detail/${journal.id}`}
