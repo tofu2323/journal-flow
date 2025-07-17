@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { JournalType, JournalEntry } from '../types'
 import { saveJournal, getJournals, updateJournal } from '../utils/db'
 import { format } from 'date-fns'
+import TagSelector from '../components/TagSelector'
 
 const JournalForm = () => {
   const { type, id } = useParams<{ type: JournalType; id?: string }>()
@@ -10,6 +11,35 @@ const JournalForm = () => {
   const [formData, setFormData] = useState<any>({})
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
+  
+  // Practice type options (stored in localStorage for persistence)
+  const [formalPracticeOptions, setFormalPracticeOptions] = useState<string[]>(() => {
+    const saved = localStorage.getItem('formalPracticeOptions')
+    return saved ? JSON.parse(saved) : [
+      'ボディスキャン',
+      '静坐瞑想',
+      '歩く瞑想',
+      'ヨガ',
+      '呼吸瞑想',
+      '慈悲の瞑想',
+      'マインドフル・ムーブメント'
+    ]
+  })
+  
+  const [informalPracticeOptions, setInformalPracticeOptions] = useState<string[]>(() => {
+    const saved = localStorage.getItem('informalPracticeOptions')
+    return saved ? JSON.parse(saved) : [
+      '歩く瞑想',
+      '食べる瞑想',
+      '日常の気づき',
+      '呼吸への気づき',
+      '感情への気づき',
+      '思考への気づき',
+      '音への気づき',
+      '家事での気づき',
+      '通勤での気づき'
+    ]
+  })
 
   useEffect(() => {
     if (id) {
@@ -45,16 +75,8 @@ const JournalForm = () => {
     try {
       if (isEditing && id) {
         // 編集モード
-        const processedFormData = { ...formData }
-        
-        // 「その他」が選択された場合、カスタム入力値を実践内容として使用
-        if (formData.practiceType === 'その他' && formData.customPracticeType) {
-          processedFormData.practiceType = formData.customPracticeType
-          delete processedFormData.customPracticeType
-        }
-        
         const updatedJournal: JournalEntry = {
-          ...processedFormData,
+          ...formData,
           updatedAt: now
         }
         await updateJournal(updatedJournal)
@@ -62,21 +84,13 @@ const JournalForm = () => {
         navigate(`/journal/detail/${id}`)
       } else {
         // 新規作成モード
-        const processedFormData = { ...formData }
-        
-        // 「その他」が選択された場合、カスタム入力値を実践内容として使用
-        if (formData.practiceType === 'その他' && formData.customPracticeType) {
-          processedFormData.practiceType = formData.customPracticeType
-          delete processedFormData.customPracticeType
-        }
-        
         const journal: JournalEntry = {
           id: `${type}-${now.getTime()}`,
           type,
           date: format(now, 'yyyy-MM-dd'),
           createdAt: now,
           updatedAt: now,
-          ...processedFormData
+          ...formData
         }
         await saveJournal(journal)
         console.log('Journal saved successfully:', journal)
@@ -92,47 +106,53 @@ const JournalForm = () => {
     setFormData((prev: any) => ({ ...prev, [field]: value }))
   }
 
+  // Update localStorage when options change
+  const updateFormalPracticeOptions = (newOptions: string[]) => {
+    setFormalPracticeOptions(newOptions)
+    localStorage.setItem('formalPracticeOptions', JSON.stringify(newOptions))
+  }
+
+  const updateInformalPracticeOptions = (newOptions: string[]) => {
+    setInformalPracticeOptions(newOptions)
+    localStorage.setItem('informalPracticeOptions', JSON.stringify(newOptions))
+  }
+
+  const handleAddFormalOption = (option: string) => {
+    const newOptions = [...formalPracticeOptions, option]
+    updateFormalPracticeOptions(newOptions)
+  }
+
+  const handleRemoveFormalOption = (option: string) => {
+    const newOptions = formalPracticeOptions.filter(opt => opt !== option)
+    updateFormalPracticeOptions(newOptions)
+  }
+
+  const handleAddInformalOption = (option: string) => {
+    const newOptions = [...informalPracticeOptions, option]
+    updateInformalPracticeOptions(newOptions)
+  }
+
+  const handleRemoveInformalOption = (option: string) => {
+    const newOptions = informalPracticeOptions.filter(opt => opt !== option)
+    updateInformalPracticeOptions(newOptions)
+  }
+
   const renderForm = () => {
     switch (type) {
       case 'formal-practice':
-        const formalPracticeOptions = [
-          'ボディスキャン',
-          '静坐瞑想',
-          '歩く瞑想',
-          'ヨガ',
-          '呼吸瞑想',
-          '慈悲の瞑想',
-          'マインドフル・ムーブメント',
-          'その他'
-        ]
-        
         return (
           <>
             <h2>🧘‍♂️ フォーマル実践の記録</h2>
             <div className="form-group">
               <label className="form-label">実践内容</label>
-              <select
-                className="form-input"
+              <TagSelector
+                options={formalPracticeOptions}
                 value={formData.practiceType || ''}
-                onChange={(e) => handleChange('practiceType', e.target.value)}
-              >
-                <option value="">選択してください</option>
-                {formalPracticeOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              {formData.practiceType === 'その他' && (
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="実践内容を入力してください"
-                  value={formData.customPracticeType || ''}
-                  onChange={(e) => handleChange('customPracticeType', e.target.value)}
-                  style={{ marginTop: '0.5rem' }}
-                />
-              )}
+                onChange={(value) => handleChange('practiceType', value)}
+                placeholder="実践内容を選択または追加してください"
+                onAddOption={handleAddFormalOption}
+                onRemoveOption={handleRemoveFormalOption}
+              />
             </div>
             <div className="form-group">
               <label className="form-label">実践時間（分）</label>
@@ -212,46 +232,19 @@ const JournalForm = () => {
         )
 
       case 'informal-practice':
-        const informalPracticeOptions = [
-          '歩く瞑想',
-          '食べる瞑想',
-          '日常の気づき',
-          '呼吸への気づき',
-          '感情への気づき',
-          '思考への気づき',
-          '音への気づき',
-          '家事での気づき',
-          '通勤での気づき',
-          'その他'
-        ]
-        
         return (
           <>
             <h2>🚶 インフォーマル実践の記録</h2>
             <div className="form-group">
               <label className="form-label">実践内容</label>
-              <select
-                className="form-input"
+              <TagSelector
+                options={informalPracticeOptions}
                 value={formData.practiceType || ''}
-                onChange={(e) => handleChange('practiceType', e.target.value)}
-              >
-                <option value="">選択してください</option>
-                {informalPracticeOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              {formData.practiceType === 'その他' && (
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="実践内容を入力してください"
-                  value={formData.customPracticeType || ''}
-                  onChange={(e) => handleChange('customPracticeType', e.target.value)}
-                  style={{ marginTop: '0.5rem' }}
-                />
-              )}
+                onChange={(value) => handleChange('practiceType', value)}
+                placeholder="実践内容を選択または追加してください"
+                onAddOption={handleAddInformalOption}
+                onRemoveOption={handleRemoveInformalOption}
+              />
             </div>
             <div className="form-group">
               <label className="form-label">実践時間（分）</label>
