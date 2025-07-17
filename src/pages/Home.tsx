@@ -1,26 +1,12 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
-
-// Mock data - 後でIndexedDBから取得
-const mockEntries = [
-  {
-    id: '1',
-    type: 'pleasant-event',
-    date: '2025-01-17',
-    preview: '今日は久しぶりに友人と会って、とても楽しい時間を過ごしました。カフェで話していると、時間があっという間に...',
-    emoji: '☀️'
-  },
-  {
-    id: '2', 
-    type: 'formal-practice',
-    date: '2025-01-16',
-    preview: '20分間のボディスキャン瞑想を行いました。最初は雑念が多かったのですが、徐々に体の感覚に集中できるように...',
-    emoji: '🧘‍♂️'
-  }
-]
+import { useState, useEffect } from 'react'
+import { JournalEntry } from '../types'
+import { getJournals, initDB } from '../utils/db'
 
 const Home = () => {
   const [showNewEntryMenu, setShowNewEntryMenu] = useState(false)
+  const [entries, setEntries] = useState<JournalEntry[]>([])
+  const [loading, setLoading] = useState(true)
   
   const journalTypes = [
     { type: 'formal-practice', title: 'フォーマル実践', emoji: '🧘‍♂️' },
@@ -29,6 +15,46 @@ const Home = () => {
     { type: 'unpleasant-event', title: '不快な出来事', emoji: '☁️' },
     { type: 'difficult-communication', title: '困難なコミュニケーション', emoji: '🗣️' }
   ]
+
+  useEffect(() => {
+    loadEntries()
+  }, [])
+
+  const loadEntries = async () => {
+    try {
+      await initDB()
+      const allEntries = await getJournals()
+      // 最新順にソート
+      const sortedEntries = allEntries.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+      setEntries(sortedEntries)
+    } catch (error) {
+      console.error('Failed to load entries:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const getJournalEmoji = (type: string) => {
+    const journalType = journalTypes.find(j => j.type === type)
+    return journalType?.emoji || '📝'
+  }
+
+  const getEntryPreview = (entry: JournalEntry) => {
+    switch (entry.type) {
+      case 'formal-practice':
+      case 'informal-practice':
+        return (entry as any).insights || ''
+      case 'pleasant-event':
+      case 'unpleasant-event':
+        return (entry as any).event || ''
+      case 'difficult-communication':
+        return (entry as any).content || ''
+      default:
+        return ''
+    }
+  }
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
@@ -43,6 +69,18 @@ const Home = () => {
     } else {
       return date.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' })
     }
+  }
+
+  const getTotalWords = () => {
+    return entries.reduce((total, entry) => {
+      const preview = getEntryPreview(entry)
+      return total + (preview ? preview.length : 0)
+    }, 0)
+  }
+
+  const getUniqueDays = () => {
+    const dates = entries.map(entry => entry.date)
+    return new Set(dates).size
   }
 
   return (
@@ -73,7 +111,7 @@ const Home = () => {
             }}>
               📝
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>2</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{entries.length}</div>
             <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>今年のエントリー</div>
           </div>
           <div style={{ textAlign: 'center' }}>
@@ -86,7 +124,7 @@ const Home = () => {
             }}>
               ✍️
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>156</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{getTotalWords()}</div>
             <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>書いた文字数</div>
           </div>
           <div style={{ textAlign: 'center' }}>
@@ -99,7 +137,7 @@ const Home = () => {
             }}>
               📅
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>2</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{getUniqueDays()}</div>
             <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>ジャーナル日数</div>
           </div>
         </div>
@@ -116,7 +154,16 @@ const Home = () => {
           January 2025
         </h2>
 
-        {mockEntries.length === 0 ? (
+{loading ? (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '3rem 1rem',
+            color: '#6b7280'
+          }}>
+            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+            <p>読み込み中...</p>
+          </div>
+        ) : entries.length === 0 ? (
           <div style={{ 
             textAlign: 'center', 
             padding: '3rem 1rem',
@@ -128,16 +175,20 @@ const Home = () => {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {mockEntries.map((entry) => (
-              <div
+            {entries.map((entry) => (
+              <Link
                 key={entry.id}
+                to={`/journal/detail/${entry.id}`}
                 style={{
                   backgroundColor: 'white',
                   borderRadius: '16px',
                   padding: '1.5rem',
                   boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                   cursor: 'pointer',
-                  transition: 'transform 0.2s, box-shadow 0.2s'
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  display: 'block'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)'
@@ -153,14 +204,15 @@ const Home = () => {
                   alignItems: 'flex-start', 
                   gap: '1rem' 
                 }}>
-                  <span style={{ fontSize: '1.5rem' }}>{entry.emoji}</span>
+                  <span style={{ fontSize: '1.5rem' }}>{getJournalEmoji(entry.type)}</span>
                   <div style={{ flex: 1 }}>
                     <p style={{ 
                       lineHeight: '1.6',
                       color: '#374151',
                       marginBottom: '0.75rem'
                     }}>
-                      {entry.preview}
+                      {getEntryPreview(entry).substring(0, 120)}
+                      {getEntryPreview(entry).length > 120 && '...'}
                     </p>
                     <div style={{ 
                       fontSize: '0.875rem', 
@@ -169,12 +221,12 @@ const Home = () => {
                       justifyContent: 'space-between',
                       alignItems: 'center'
                     }}>
-                      <span>{formatDate(entry.date)}</span>
+                      <span>{formatDate(entry.createdAt.toString())}</span>
                       <span>•••</span>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
