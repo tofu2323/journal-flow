@@ -65,9 +65,11 @@ const TagSelector = ({
   }
 
   const handleRemove = (option: string) => {
-    onRemoveOption?.(option)
-    if (value === option) {
-      onChange('')
+    if (confirm(`「${option}」を削除しますか？`)) {
+      onRemoveOption?.(option)
+      if (value === option) {
+        onChange('')
+      }
     }
   }
 
@@ -197,7 +199,9 @@ const TagSelector = ({
                 </span>
                 <div style={{ display: 'flex', gap: '0.25rem' }}>
                   <button
+                    type="button"
                     onClick={(e) => {
+                      e.preventDefault()
                       e.stopPropagation()
                       handleEdit(option)
                     }}
@@ -214,7 +218,9 @@ const TagSelector = ({
                     ✏️
                   </button>
                   <button
+                    type="button"
                     onClick={(e) => {
+                      e.preventDefault()
                       e.stopPropagation()
                       handleRemove(option)
                     }}
