@@ -82,7 +82,25 @@ const JournalList = () => {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {journals.map((journal) => (
-              <div key={journal.id} className="card" style={{ margin: 0 }}>
+              <Link 
+                key={journal.id} 
+                to={`/journal/detail/${journal.id}`}
+                className="card" 
+                style={{ 
+                  margin: 0, 
+                  textDecoration: 'none', 
+                  color: 'inherit',
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
+                }}
+              >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                   <h3 style={{ margin: 0, fontSize: '1.1rem' }}>
                     {journalTypeLabels[journal.type]}
@@ -103,7 +121,7 @@ const JournalList = () => {
                   {getPreview(journal).substring(0, 100)}
                   {getPreview(journal).length > 100 && '...'}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
         )}
