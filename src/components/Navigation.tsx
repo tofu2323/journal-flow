@@ -3,35 +3,51 @@ import { Link, useLocation } from 'react-router-dom'
 const Navigation = () => {
   const location = useLocation()
 
+  // ホーム画面では非表示
+  if (location.pathname === '/') {
+    return null
+  }
+
   return (
-    <nav className="nav">
-      <div className="nav-container">
-        <Link to="/" className="nav-title">
-          🌊
+    <nav style={{
+      backgroundColor: 'white',
+      borderBottom: '1px solid #e5e7eb',
+      padding: '1rem 0',
+      position: 'sticky',
+      top: 0,
+      zIndex: 100
+    }}>
+      <div style={{
+        maxWidth: '768px',
+        margin: '0 auto',
+        padding: '0 1rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <Link 
+          to="/" 
+          style={{
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            color: '#4f46e5',
+            textDecoration: 'none'
+          }}
+        >
+          Journal Flow 🌊
         </Link>
-        <div className="nav-links">
-          <Link 
-            to="/" 
-            className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
-          >
-            <span style={{ fontSize: '1.2rem' }}>🏠</span>
-            <span>ホーム</span>
-          </Link>
-          <Link 
-            to="/list" 
-            className={`nav-link ${location.pathname === '/list' ? 'active' : ''}`}
-          >
-            <span style={{ fontSize: '1.2rem' }}>📖</span>
-            <span>すべて</span>
-          </Link>
-          <Link 
-            to="/theme" 
-            className={`nav-link ${location.pathname === '/theme' ? 'active' : ''}`}
-          >
-            <span style={{ fontSize: '1.2rem' }}>🎯</span>
-            <span>テーマ</span>
-          </Link>
-        </div>
+        
+        {location.pathname === '/list' && (
+          <button style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '1.5rem',
+            cursor: 'pointer',
+            color: '#6b7280'
+          }}>
+            •••
+          </button>
+        )}
       </div>
     </nav>
   )

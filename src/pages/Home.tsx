@@ -1,199 +1,279 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { JournalEntry } from '../types'
-import { getJournals } from '../utils/db'
-import { format } from 'date-fns'
-import { ja } from 'date-fns/locale'
+import { useState } from 'react'
 
-const journalTypes = [
+// Mock data - 後でIndexedDBから取得
+const mockEntries = [
   {
-    type: 'formal-practice',
-    title: 'フォーマル実践',
-    emoji: '🧘‍♂️',
-    description: 'ボディスキャン・静坐瞑想・ヨガでの気づき'
-  },
-  {
-    type: 'informal-practice', 
-    title: 'インフォーマル実践',
-    emoji: '🚶',
-    description: '歩く・食べる・日常での気づき'
-  },
-  {
+    id: '1',
     type: 'pleasant-event',
-    title: '快な出来事',
-    emoji: '☀️',
-    description: '心地よいと感じた出来事の記録'
+    date: '2025-01-17',
+    preview: '今日は久しぶりに友人と会って、とても楽しい時間を過ごしました。カフェで話していると、時間があっという間に...',
+    emoji: '☀️'
   },
   {
-    type: 'unpleasant-event',
-    title: '不快な出来事', 
-    emoji: '☁️',
-    description: '不快と感じた出来事の記録'
-  },
-  {
-    type: 'difficult-communication',
-    title: '困難なコミュニケーション',
-    emoji: '🗣️',
-    description: '対人コミュニケーションの振り返り'
+    id: '2', 
+    type: 'formal-practice',
+    date: '2025-01-16',
+    preview: '20分間のボディスキャン瞑想を行いました。最初は雑念が多かったのですが、徐々に体の感覚に集中できるように...',
+    emoji: '🧘‍♂️'
   }
 ]
 
-const journalTypeLabels = {
-  'formal-practice': '🧘‍♂️ フォーマル実践',
-  'informal-practice': '🚶 インフォーマル実践',
-  'pleasant-event': '☀️ 快な出来事',
-  'unpleasant-event': '☁️ 不快な出来事',
-  'difficult-communication': '🗣️ 困難なコミュニケーション'
-}
-
 const Home = () => {
-  const [recentJournals, setRecentJournals] = useState<JournalEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const [showNewEntryMenu, setShowNewEntryMenu] = useState(false)
+  
+  const journalTypes = [
+    { type: 'formal-practice', title: 'フォーマル実践', emoji: '🧘‍♂️' },
+    { type: 'informal-practice', title: 'インフォーマル実践', emoji: '🚶' },
+    { type: 'pleasant-event', title: '快な出来事', emoji: '☀️' },
+    { type: 'unpleasant-event', title: '不快な出来事', emoji: '☁️' },
+    { type: 'difficult-communication', title: '困難なコミュニケーション', emoji: '🗣️' }
+  ]
 
-  useEffect(() => {
-    loadRecentJournals()
-  }, [])
-
-  const loadRecentJournals = async () => {
-    try {
-      const journals = await getJournals()
-      // 最新の3件を取得
-      const recent = journals
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, 3)
-      setRecentJournals(recent)
-    } catch (error) {
-      console.error('Failed to load recent journals:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const getPreview = (journal: JournalEntry) => {
-    switch (journal.type) {
-      case 'formal-practice':
-      case 'informal-practice':
-        return (journal as any).insights || ''
-      case 'pleasant-event':
-      case 'unpleasant-event':
-        return (journal as any).event || ''
-      case 'difficult-communication':
-        return (journal as any).content || ''
-      default:
-        return ''
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    const today = new Date()
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    
+    if (date.toDateString() === today.toDateString()) {
+      return '今日'
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return '昨日'
+    } else {
+      return date.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' })
     }
   }
 
   return (
-    <div className="container">
-      {/* ヘッダー */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ marginBottom: '0.5rem', fontSize: '2rem', fontWeight: '700' }}>
-          Journal Flow
-        </h1>
-        <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
-          マインドフルネスの気づきを記録しよう
-        </p>
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: '#f8fafc',
+      paddingBottom: '100px' // FABのスペース確保
+    }}>
+      {/* Header Stats */}
+      <div style={{ 
+        padding: '1rem',
+        backgroundColor: 'white',
+        borderBottom: '1px solid #e5e7eb'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          maxWidth: '768px',
+          margin: '0 auto'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ 
+              backgroundColor: '#e0e7ff', 
+              borderRadius: '12px', 
+              padding: '0.5rem',
+              marginBottom: '0.25rem',
+              display: 'inline-block'
+            }}>
+              📝
+            </div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>2</div>
+            <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>今年のエントリー</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ 
+              backgroundColor: '#fce7f3', 
+              borderRadius: '12px', 
+              padding: '0.5rem',
+              marginBottom: '0.25rem',
+              display: 'inline-block'
+            }}>
+              ✍️
+            </div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>156</div>
+            <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>書いた文字数</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ 
+              backgroundColor: '#ddd6fe', 
+              borderRadius: '12px', 
+              padding: '0.5rem',
+              marginBottom: '0.25rem',
+              display: 'inline-block'
+            }}>
+              📅
+            </div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>2</div>
+            <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>ジャーナル日数</div>
+          </div>
+        </div>
       </div>
 
-      {/* 最近のエントリー */}
-      {!loading && recentJournals.length > 0 && (
-        <div style={{ marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '600' }}>最近の記録</h2>
-            <Link to="/list" style={{ color: '#4f46e5', textDecoration: 'none', fontSize: '0.9rem' }}>
-              すべて見る →
-            </Link>
+      {/* Timeline */}
+      <div style={{ maxWidth: '768px', margin: '0 auto', padding: '1rem' }}>
+        <h2 style={{ 
+          fontSize: '1.5rem', 
+          fontWeight: 'bold', 
+          marginBottom: '1rem',
+          color: '#1f2937'
+        }}>
+          January 2025
+        </h2>
+
+        {mockEntries.length === 0 ? (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '3rem 1rem',
+            color: '#6b7280'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🌊</div>
+            <h3 style={{ marginBottom: '0.5rem' }}>最初のジャーナルを書いてみましょう</h3>
+            <p>思いついた時にサクッと記録して、フロー状態でジャーナリングしましょう</p>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {recentJournals.map((journal) => (
-              <Link 
-                key={journal.id} 
-                to={`/journal/detail/${journal.id}`}
-                className="card" 
-                style={{ 
-                  margin: 0,
-                  padding: '1rem',
-                  textDecoration: 'none', 
-                  color: 'inherit',
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {mockEntries.map((entry) => (
+              <div
+                key={entry.id}
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: '16px',
+                  padding: '1.5rem',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                  cursor: 'pointer',
                   transition: 'transform 0.2s, box-shadow 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)'
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.12)'
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)'
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)'
                   e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600' }}>
-                    {journalTypeLabels[journal.type]}
-                  </h3>
-                  <span style={{ color: '#9ca3af', fontSize: '0.8rem' }}>
-                    {format(new Date(journal.createdAt), 'M/d HH:mm', { locale: ja })}
-                  </span>
-                </div>
-                <p style={{ 
-                  color: '#6b7280', 
-                  margin: 0,
-                  fontSize: '0.9rem',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical'
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'flex-start', 
+                  gap: '1rem' 
                 }}>
-                  {getPreview(journal).substring(0, 80)}
-                  {getPreview(journal).length > 80 && '...'}
-                </p>
+                  <span style={{ fontSize: '1.5rem' }}>{entry.emoji}</span>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ 
+                      lineHeight: '1.6',
+                      color: '#374151',
+                      marginBottom: '0.75rem'
+                    }}>
+                      {entry.preview}
+                    </p>
+                    <div style={{ 
+                      fontSize: '0.875rem', 
+                      color: '#6b7280',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <span>{formatDate(entry.date)}</span>
+                      <span>•••</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Floating Action Button */}
+      <div style={{
+        position: 'fixed',
+        bottom: '2rem',
+        right: '2rem',
+        zIndex: 1000
+      }}>
+        <button
+          onClick={() => setShowNewEntryMenu(!showNewEntryMenu)}
+          style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            backgroundColor: '#4f46e5',
+            color: 'white',
+            border: 'none',
+            fontSize: '1.5rem',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(79, 70, 229, 0.4)',
+            transition: 'all 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)'
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(79, 70, 229, 0.5)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)'
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.4)'
+          }}
+        >
+          {showNewEntryMenu ? '×' : '+'}
+        </button>
+
+        {/* New Entry Menu */}
+        {showNewEntryMenu && (
+          <div style={{
+            position: 'absolute',
+            bottom: '70px',
+            right: '0',
+            backgroundColor: 'white',
+            borderRadius: '16px',
+            padding: '1rem',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+            minWidth: '200px',
+            animation: 'fadeInUp 0.2s ease-out'
+          }}>
+            <div style={{ marginBottom: '0.5rem', fontWeight: '600', color: '#374151' }}>
+              新しいジャーナル
+            </div>
+            {journalTypes.map((type) => (
+              <Link
+                key={type.type}
+                to={`/journal/${type.type}`}
+                onClick={() => setShowNewEntryMenu(false)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f3f4f6'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                }}
+              >
+                <span style={{ fontSize: '1.2rem' }}>{type.emoji}</span>
+                <span style={{ fontSize: '0.9rem' }}>{type.title}</span>
               </Link>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* 新しいエントリーを作成 */}
-      <div style={{ marginBottom: '1rem' }}>
-        <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '600', marginBottom: '1rem' }}>
-          新しい記録を作成
-        </h2>
+        )}
       </div>
 
-      <div style={{ display: 'grid', gap: '0.75rem' }}>
-        {journalTypes.map((journal) => (
-          <Link
-            key={journal.type}
-            to={`/journal/${journal.type}`}
-            className="card"
-            style={{ 
-              textDecoration: 'none', 
-              color: 'inherit',
-              padding: '1rem',
-              transition: 'transform 0.2s, box-shadow 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)'
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.12)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <span style={{ fontSize: '1.5rem' }}>{journal.emoji}</span>
-              <div>
-                <h3 style={{ marginBottom: '0.25rem', fontSize: '1rem', fontWeight: '600' }}>{journal.title}</h3>
-                <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: 0 }}>
-                  {journal.description}
-                </p>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   )
 }
