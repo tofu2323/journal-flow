@@ -353,13 +353,9 @@ const Home = () => {
                     </p>
                     <div style={{ 
                       fontSize: '0.875rem', 
-                      color: '#6b7280',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
+                      color: '#6b7280'
                     }}>
                       <span>{formatDate(entry.createdAt.toString())}</span>
-                      <span>•••</span>
                     </div>
                   </div>
                 </div>
