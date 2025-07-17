@@ -1,7 +1,8 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 const Navigation = () => {
   const location = useLocation()
+  const navigate = useNavigate()
 
   // ホーム画面では非表示
   if (location.pathname === '/') {
@@ -10,9 +11,10 @@ const Navigation = () => {
 
   return (
     <nav style={{
-      backgroundColor: 'white',
-      borderBottom: '1px solid #e5e7eb',
-      padding: '1rem 0',
+      background: 'rgba(255, 255, 255, 0.8)',
+      backdropFilter: 'blur(20px)',
+      borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+      padding: 'var(--space-4) 0',
       position: 'sticky',
       top: 0,
       zIndex: 100
@@ -20,34 +22,62 @@ const Navigation = () => {
       <div style={{
         maxWidth: '768px',
         margin: '0 auto',
-        padding: '0 1rem',
+        padding: '0 var(--space-4)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '1.5rem',
+            cursor: 'pointer',
+            color: 'var(--gray-600)',
+            padding: 'var(--space-2)',
+            borderRadius: 'var(--radius-lg)',
+            transition: 'all 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'var(--gray-100)'
+            e.currentTarget.style.color = 'var(--gray-800)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'none'
+            e.currentTarget.style.color = 'var(--gray-600)'
+          }}
+        >
+          ← 戻る
+        </button>
+        
+        {/* Home Link */}
         <Link 
           to="/" 
           style={{
-            fontSize: '1.5rem',
-            fontWeight: '700',
-            color: '#4f46e5',
-            textDecoration: 'none'
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            color: 'var(--primary-600)',
+            textDecoration: 'none',
+            letterSpacing: '-0.025em',
+            transition: 'color 0.2s'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--primary-700)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--primary-600)'
           }}
         >
           Journal Flow 🌊
         </Link>
         
-        {location.pathname === '/list' && (
-          <button style={{
-            background: 'none',
-            border: 'none',
-            fontSize: '1.5rem',
-            cursor: 'pointer',
-            color: '#6b7280'
-          }}>
-            •••
-          </button>
-        )}
+        {/* Spacer for centering */}
+        <div style={{ width: '80px' }}></div>
       </div>
     </nav>
   )
