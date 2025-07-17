@@ -219,7 +219,8 @@ const Home = () => {
                 onClick={() => setSelectedType('all')}
                 style={{
                   padding: '0.5rem 1rem',
-                  border: selectedType === 'all' ? 'none' : '1px solid #e5e7eb',
+                  border: '1px solid transparent',
+                  borderColor: selectedType === 'all' ? '#007AFF' : '#e5e7eb',
                   borderRadius: '20px',
                   background: selectedType === 'all' ? '#007AFF' : 'white',
                   color: selectedType === 'all' ? 'white' : '#6b7280',
@@ -241,7 +242,8 @@ const Home = () => {
                     onClick={() => setSelectedType(type.type)}
                     style={{
                       padding: '0.5rem 1rem',
-                      border: selectedType === type.type ? 'none' : '1px solid #e5e7eb',
+                      border: '1px solid transparent',
+                      borderColor: selectedType === type.type ? '#007AFF' : '#e5e7eb',
                       borderRadius: '20px',
                       background: selectedType === type.type ? '#007AFF' : 'white',
                       color: selectedType === type.type ? 'white' : '#6b7280',
