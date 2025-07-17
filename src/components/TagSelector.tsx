@@ -19,8 +19,7 @@ const TagSelector = ({
 }: TagSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [isEditing, setIsEditing] = useState(false)
-  const [editingOption, setEditingOption] = useState('')
+
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -44,25 +43,7 @@ const TagSelector = ({
     }
   }
 
-  const handleEdit = (option: string) => {
-    setEditingOption(option)
-    setIsEditing(true)
-    setSearchQuery(option)
-  }
 
-  const handleSaveEdit = () => {
-    if (searchQuery.trim() && searchQuery.trim() !== editingOption) {
-      onRemoveOption?.(editingOption)
-      onAddOption?.(searchQuery.trim())
-      if (value === editingOption) {
-        onChange(searchQuery.trim())
-      }
-    }
-    setIsEditing(false)
-    setEditingOption('')
-    setSearchQuery('')
-    setIsOpen(false)
-  }
 
   const handleRemove = (option: string) => {
     if (confirm(`「${option}」を削除しますか？`)) {
@@ -77,9 +58,7 @@ const TagSelector = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false)
-        setIsEditing(false)
         setSearchQuery('')
-        setEditingOption('')
       }
     }
 
@@ -155,15 +134,12 @@ const TagSelector = ({
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
-                  if (isEditing) {
-                    handleSaveEdit()
-                  } else if (searchQuery.trim()) {
+                  if (searchQuery.trim()) {
                     handleAddNew()
                   }
                 }
                 if (e.key === 'Escape') {
                   setIsOpen(false)
-                  setIsEditing(false)
                   setSearchQuery('')
                 }
               }}
@@ -198,25 +174,7 @@ const TagSelector = ({
                   {option}
                 </span>
                 <div style={{ display: 'flex', gap: '0.25rem' }}>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      handleEdit(option)
-                    }}
-                    style={{
-                      padding: '0.25rem',
-                      border: 'none',
-                      background: 'none',
-                      cursor: 'pointer',
-                      color: '#6b7280',
-                      fontSize: '0.75rem'
-                    }}
-                    title="編集"
-                  >
-                    ✏️
-                  </button>
+
                   <button
                     type="button"
                     onClick={(e) => {
@@ -241,7 +199,7 @@ const TagSelector = ({
             ))}
 
             {/* Add New Option */}
-            {searchQuery.trim() && !options.includes(searchQuery.trim()) && !isEditing && (
+            {searchQuery.trim() && !options.includes(searchQuery.trim()) && (
               <div
                 onClick={handleAddNew}
                 style={{
@@ -256,25 +214,6 @@ const TagSelector = ({
               >
                 <span>➕</span>
                 <span>「{searchQuery}」を追加</span>
-              </div>
-            )}
-
-            {/* Save Edit */}
-            {isEditing && (
-              <div
-                onClick={handleSaveEdit}
-                style={{
-                  padding: '0.5rem',
-                  cursor: 'pointer',
-                  color: '#059669',
-                  borderTop: '1px solid #e5e7eb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                <span>✅</span>
-                <span>「{searchQuery}」に変更</span>
               </div>
             )}
           </div>
