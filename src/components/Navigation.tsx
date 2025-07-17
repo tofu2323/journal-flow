@@ -7,20 +7,22 @@ const Navigation = () => {
     <nav className="nav">
       <div className="nav-container">
         <Link to="/" className="nav-title">
-          Journal Flow 🌊
+          🌊
         </Link>
         <div className="nav-links">
           <Link 
             to="/" 
             className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
           >
-            ホーム
+            <span style={{ fontSize: '1.2rem' }}>🏠</span>
+            <span>ホーム</span>
           </Link>
           <Link 
             to="/list" 
             className={`nav-link ${location.pathname === '/list' ? 'active' : ''}`}
           >
-            振り返り
+            <span style={{ fontSize: '1.2rem' }}>📖</span>
+            <span>すべて</span>
           </Link>
         </div>
       </div>
