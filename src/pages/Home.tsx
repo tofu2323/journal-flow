@@ -87,17 +87,12 @@ const Home = () => {
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    const today = new Date()
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
-    
-    if (date.toDateString() === today.toDateString()) {
-      return '今日'
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return '昨日'
-    } else {
-      return date.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' })
-    }
+    return date.toLocaleDateString('ja-JP', { 
+      month: 'numeric', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
   const getTotalWords = () => {
@@ -180,7 +175,7 @@ const Home = () => {
           marginBottom: '1rem',
           color: '#1f2937'
         }}>
-          January 2025
+          {new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' })}
         </h2>
 
         {/* Search and Filter */}
