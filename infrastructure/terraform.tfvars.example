@@ -14,4 +14,8 @@ supabase_db_password_prod = "your-prod-database-password-here"
 # GitHub configuration
 github_token = "your-github-personal-access-token-here"
 github_repository_name = "journal-flow"
+github_repository_owner = "tofu2323"
 production_reviewers = ["your-github-username"]
+
+# Vercel configuration
+vercel_api_token = "your-vercel-api-token-here"

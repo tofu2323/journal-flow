@@ -49,3 +49,19 @@ variable "production_reviewers" {
   type        = list(string)
   default     = []
 }
+
+variable "vercel_api_token" {
+  description = "Vercel API token"
+  type        = string
+  sensitive   = true
+}
+
+variable "vercel_org_id" {
+  description = "Vercel organization ID"
+  type        = string
+}
+
+variable "vercel_project_id" {
+  description = "Vercel project ID"
+  type        = string
+}

@@ -46,3 +46,15 @@ variable "production_reviewers" {
   type        = list(string)
   default     = []
 }
+
+variable "vercel_api_token" {
+  description = "Vercel API token"
+  type        = string
+  sensitive   = true
+}
+
+variable "github_repository_owner" {
+  description = "GitHub repository owner"
+  type        = string
+  default     = "tofu2323"
+}

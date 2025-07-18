@@ -41,3 +41,13 @@ output "github_production_environment_id" {
   description = "GitHub production environment ID"
   value       = module.github_repo.production_environment_id
 }
+
+output "vercel_project_id" {
+  description = "Vercel project ID"
+  value       = module.vercel_project.project_id
+}
+
+output "vercel_production_url" {
+  description = "Vercel production URL"
+  value       = module.vercel_project.production_url
+}

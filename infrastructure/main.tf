@@ -10,6 +10,10 @@ terraform {
       source  = "integrations/github"
       version = "~> 5.0"
     }
+    vercel = {
+      source  = "vercel/vercel"
+      version = "~> 0.15"
+    }
   }
 
   # Backend configuration for state management
@@ -29,6 +33,11 @@ provider "supabase" {
 # Configure the GitHub Provider
 provider "github" {
   token = var.github_token
+}
+
+# Configure the Vercel Provider
+provider "vercel" {
+  api_token = var.vercel_api_token
 }
 
 # Development Environment
@@ -64,4 +73,19 @@ module "github_repo" {
   supabase_project_ref_dev   = module.supabase_dev.project_id
   supabase_project_ref_prod  = module.supabase_prod.project_id
   production_reviewers       = var.production_reviewers
+  vercel_api_token           = var.vercel_api_token
+  vercel_org_id              = module.vercel_project.project_id
+  vercel_project_id          = module.vercel_project.project_id
+}
+
+# Vercel Project Management
+module "vercel_project" {
+  source = "./modules/vercel"
+
+  project_name           = "journal-flow"
+  github_repository      = "${var.github_repository_owner}/${var.github_repository_name}"
+  supabase_url_prod      = module.supabase_prod.project_url
+  supabase_anon_key_prod = module.supabase_prod.anon_key
+  supabase_url_dev       = module.supabase_dev.project_url
+  supabase_anon_key_dev  = module.supabase_dev.anon_key
 }
