@@ -21,4 +21,4 @@ npm run dev
 
 GitHub Pagesに自動デプロイされます。
 
-Live Demo: https://[username].github.io/journal-flow/
+Live Demo: https://[username].github.io/journal-flow/# CI/CD Test - Fri Jul 18 12:51:59 JST 2025

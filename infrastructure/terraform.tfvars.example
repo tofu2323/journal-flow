@@ -1,0 +1,17 @@
+# Example Terraform variables file
+# Copy this file to terraform.tfvars and fill in your actual values
+# DO NOT commit terraform.tfvars to version control
+
+# Supabase configuration
+supabase_access_token = "your-supabase-access-token-here"
+supabase_org_id      = "your-supabase-organization-id-here"
+supabase_region      = "ap-northeast-1"
+
+# Database passwords (use strong, unique passwords)
+supabase_db_password_dev  = "your-dev-database-password-here"
+supabase_db_password_prod = "your-prod-database-password-here"
+
+# GitHub configuration
+github_token = "your-github-personal-access-token-here"
+github_repository_name = "journal-flow"
+production_reviewers = ["your-github-username"]

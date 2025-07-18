@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "test": "echo 'Tests will be implemented later' && exit 0",
+    "test:ci": "npm run lint && npm run type-check && npm run test",
+    "build:ci": "npm run test:ci && npm run build"
   },
   "dependencies": {
     "react": "^18.2.0",
