@@ -42,26 +42,25 @@ jobs:
         with:
           version: latest
 
-      - name: Validate migration files
-        run: |
-          echo "🔍 Validating migration files..."
-          for file in supabase/migrations/*.sql; do
-            if [ -f "$file" ]; then
-              echo "✅ Found migration: $(basename "$file")"
-              # Basic SQL syntax check
-              if grep -q "CREATE TABLE\|ALTER TABLE\|CREATE POLICY" "$file"; then
-                echo "✅ Migration contains valid SQL statements"
-              else
-                echo "⚠️  Migration may not contain expected SQL statements"
-              fi
-            fi
-          done
-          echo "✅ Migration validation completed"
+      - name: Start Supabase local development setup
+        run: supabase start
 
-      - name: Generate TypeScript types (dry run)
+      - name: Verify generated types are up to date
         run: |
-          echo "📝 TypeScript type generation would be performed here"
-          echo "This step validates that the schema is compatible with type generation"
+          supabase gen types typescript --local > schema.gen.ts
+          if ! git diff --ignore-space-at-eol --exit-code --quiet schema.gen.ts; then
+            echo "Detected uncommitted changes after build. See status below:"
+            git diff schema.gen.ts
+            exit 1
+          fi
+
+      - name: Run database tests
+        run: |
+          # Add your database tests here
+          echo "Database tests would run here"
+
+      - name: Stop Supabase
+        run: supabase stop
 
   deploy-dev:
     name: Deploy to Development
